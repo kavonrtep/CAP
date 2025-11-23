@@ -10,11 +10,28 @@ dependencies:
   - r-optparse
   - r-ggplot2
   - r-data.table
+  - r-stringr
+  - r-scales
+  - r-seqinr
+  - r-igraph
+  - r-rcpp
+  - r-rcpparmadillo
+  - r-mass
+  - r-matrix
+  - r-segmented
+  - bioconductor-biostrings
+  - bioconductor-genomicranges
+  - bioconductor-iranges
+  - bioconductor-msa
+  - bioconductor-biocgenerics
+  - bioconductor-s4vectors
+  - bioconductor-xvector
   - python=3.11
   - pandas
   - joblib
   - xgboost
   - scikit-learn
+  - numpy
   - mafft
   - hmmer
   - git

@@ -40,7 +40,6 @@ process CHECK_DEPS {
 }
 
 
-
 // ──────────────────────── TRASH2 ────────────────────────
 process TRASH2 {
     publishDir "${params.outdir}", mode: 'copy'
@@ -59,7 +58,7 @@ process TRASH2 {
     def t = params.templates ? "-t ${params.templates}" : ''
     """
     echo "Running TRASH2 with output dir: \$PWD"
-    ${workflow.projectDir}/modules/TRASH_2/src/TRASH.R -f ${assembly} -o \$PWD \
+    Rscript ${workflow.projectDir}/modules/TRASH_2/src/TRASH.R -f ${assembly} -o \$PWD \
         --cores_no ${task.cpus} \
         --max_rep_size ${params.max_rep_size} \
         ${t}
@@ -230,6 +229,10 @@ process CTW {
     path "${assembly.baseName}_CTW.csv"
     script:
     """
+    # Install BCT if not already available
+    Rscript -e 'if (!require("BCT", quietly = TRUE)) { install.packages("BCT", repos="https://cloud.r-project.org", dependencies=FALSE, quiet=TRUE) }'
+
+    # Run CTW analysis
     Rscript ${workflow.projectDir}/bin/CTW.R ${assembly} ${assembly.baseName}_CTW.csv
     """
 }
@@ -237,7 +240,7 @@ process CTW {
 // ────────────────────── FINAL CAP ──────────────────────
 process CAP {
     publishDir "${params.outdir}", mode: 'copy'
-	
+
     input:
     path predictions
     tuple path(repeats_r), path(arrays_r), path(genome_classes)
@@ -248,15 +251,19 @@ process CAP {
     path gc_ch
     path ctw_ch
     path scores
-	
+
     output:
     path "${assembly.baseName}_CAP_plot_*.png"
-    path "${assembly.baseName}_CAP_dotplot.png"
+    path "${assembly.baseName}_CAP_dotplot.png", optional: true
     path "${assembly.baseName}_CAP_repeat_families.csv"
     path "${assembly.baseName}_CAP_model.txt"
-	
+
     script:
     """
+    # Install BCT if not already available
+    Rscript -e 'if (!require("BCT", quietly = TRUE)) { install.packages("BCT", repos="https://cloud.r-project.org", dependencies=FALSE, quiet=TRUE) }'
+
+    # Run CAP analysis
     Rscript ${workflow.projectDir}/bin/CAP.R \
         ${predictions} ${repeats_r} ${arrays_r} ${genome_classes} \
         ${metadata} ${assembly.baseName} \
@@ -328,6 +335,7 @@ See README.md for full details: https://github.com/vlothec/CAP
 }
 
     ready_ch = CHECK_DEPS()
+
     // Input channels
     assembly_ch = channel.fromPath(params.assembly, checkIfExists: true)
     //templates_ch = params.templates ? channel.fromPath(params.templates) : channel.value(null)
