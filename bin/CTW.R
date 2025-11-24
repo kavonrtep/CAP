@@ -58,18 +58,16 @@ for(i in seq_along(fasta)) {
     CTW.values[CTW.values > 1] = 1
     CTW.values[CTW.values < 0] = 0
     CTW.values = CTW.values * 100
-    
+
     ctw_data <- rbind(ctw_data, data.frame(chromosome = rep(metadata_data$chromosome.name[i], length(mids)),
                                           bin_mid = mids,
                                           bin_value = CTW.values))
   } else {
     message("CTW calculation is disabled to save time; filling with zeros.")
+    ctw_data <- rbind(ctw_data, data.frame(chromosome = rep(metadata_data$chromosome.name[i], length(mids)),
+                                           bin_mid = mids,
+                                           bin_value = rep(0, length(mids))))
   }
-  
-
-  ctw_data <- rbind(ctw_data, data.frame(chromosome = rep(metadata_data$chromosome.name[i], length(mids)),
-                                         bin_mid = mids,
-                                         bin_value = rep(0, length(mids))))
   
 }
 
